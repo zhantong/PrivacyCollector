@@ -15,7 +15,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        startWifiCollector();
+        startContactCollector();
     }
 
     private void startWifiCollector() {
@@ -26,6 +26,22 @@ public class MainActivity extends Activity {
                 wifiCollector.collect();
                 List<ScanResult> scanResults = wifiCollector.getResult();
                 Log.i(TAG, scanResults.toString());
+            }
+        }).start();
+    }
+
+    private void startContactCollector() {
+        final ContactCollector contactCollector = new ContactCollector();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                contactCollector.collect();
+                List<String[]> results = contactCollector.getResult();
+                if (results != null) {
+                    for (String[] item : results) {
+                        Log.i(TAG, "name: " + item[0] + " number: " + item[1]);
+                    }
+                }
             }
         }).start();
     }
