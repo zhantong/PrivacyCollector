@@ -17,7 +17,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        startGpsCollector();
+        startSmsCollector();
     }
 
     private void startWifiCollector() {
@@ -87,6 +87,22 @@ public class MainActivity extends Activity {
                 BDLocation result = locationCollector.getResult();
                 if (result != null) {
                     Log.i(TAG, "loc type: " + result.getLocType() + " （161： 网络定位结果，网络定位成功。）");
+                }
+            }
+        }).start();
+    }
+
+    private void startSmsCollector() {
+        final SmsColletor smsColletor = new SmsColletor();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                smsColletor.collect();
+                List<String[]> results = smsColletor.getResult();
+                if (results != null) {
+                    for (String[] item : results) {
+                        Log.i(TAG, "address: " + item[0] + " type: " + item[1] + " date: " + item[2] + " person: " + item[3]);
+                    }
                 }
             }
         }).start();
