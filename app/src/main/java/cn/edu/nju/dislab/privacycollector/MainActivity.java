@@ -15,7 +15,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        startCallLogCollector();
+        startAudioCollector();
     }
 
     private void startWifiCollector() {
@@ -57,6 +57,20 @@ public class MainActivity extends Activity {
                     for (String[] item : results) {
                         Log.i(TAG, "number: " + item[0] + " type: " + item[1] + " date: " + item[2] + " duration: " + item[3]);
                     }
+                }
+            }
+        }).start();
+    }
+
+    private void startAudioCollector() {
+        final AudioCollector audioCollector = new AudioCollector();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                audioCollector.collect();
+                List<Double> results = audioCollector.getResult();
+                if (results != null) {
+                    Log.i(TAG, results.toString());
                 }
             }
         }).start();
