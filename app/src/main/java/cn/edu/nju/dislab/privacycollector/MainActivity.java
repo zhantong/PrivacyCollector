@@ -15,7 +15,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        startContactCollector();
+        startCallLogCollector();
     }
 
     private void startWifiCollector() {
@@ -40,6 +40,22 @@ public class MainActivity extends Activity {
                 if (results != null) {
                     for (String[] item : results) {
                         Log.i(TAG, "name: " + item[0] + " number: " + item[1]);
+                    }
+                }
+            }
+        }).start();
+    }
+
+    private void startCallLogCollector() {
+        final CallLogCollector callLogCollector = new CallLogCollector();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                callLogCollector.collect();
+                List<String[]> results = callLogCollector.getResult();
+                if (results != null) {
+                    for (String[] item : results) {
+                        Log.i(TAG, "number: " + item[0] + " type: " + item[1] + " date: " + item[2] + " duration: " + item[3]);
                     }
                 }
             }
