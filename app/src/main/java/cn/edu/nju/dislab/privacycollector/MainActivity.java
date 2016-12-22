@@ -20,7 +20,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        startSensorsCollector();
+        startScreenCollector();
     }
 
     private void startWifiCollector() {
@@ -129,6 +129,18 @@ public class MainActivity extends Activity {
                         }
                     }
                 }
+            }
+        }).start();
+    }
+
+    private void startScreenCollector() {
+        final ScreenCollector screenCollector = new ScreenCollector();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                screenCollector.collect();
+                boolean result = screenCollector.getResult();
+                Log.i(TAG, "is screen on: " + result);
             }
         }).start();
     }
