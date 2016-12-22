@@ -1,5 +1,6 @@
 package cn.edu.nju.dislab.privacycollector;
 
+import android.Manifest;
 import android.app.ActivityManager;
 import android.app.usage.UsageEvents;
 import android.app.usage.UsageStatsManager;
@@ -12,6 +13,8 @@ import android.util.Log;
 
 public class ForegroundAppCollector {
     private static final String TAG = "ForegroundAppCollector";
+    private static final String[] PERMISSIONS_LESS_L = {Manifest.permission.GET_TASKS};
+    private static final String[] PERMISSIONS_EG_L = {Manifest.permission.PACKAGE_USAGE_STATS};
     private Context mContext;
     private ActivityManager mActivityManager;
     private UsageStatsManager mUsageStatsManager;
@@ -75,11 +78,19 @@ public class ForegroundAppCollector {
                 Log.i(TAG, "null foregroundTaskInfo");
                 return;
             }
-            result = foregroundTaskInfo.topActivity.getPackageName();
+            result = foregroundTaskInfo.baseActivity.getPackageName();
         }
     }
 
     public String getResult() {
         return result;
+    }
+
+    public static String[] getPermissions() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            return PERMISSIONS_EG_L;
+        } else {
+            return PERMISSIONS_LESS_L;
+        }
     }
 }

@@ -15,6 +15,7 @@ import static android.content.Context.POWER_SERVICE;
 
 public class ScreenCollector {
     private static final String TAG = "ScreenCollector";
+    private static final String[] PERMISSIONS = {};
     private Context mContext;
     private DisplayManager mDisplayManager;
     private PowerManager mPowerManager;
@@ -49,5 +50,9 @@ public class ScreenCollector {
 
     public boolean getResult() {
         return result;
+    }
+
+    public static String[] getPermissions() {
+        return PERMISSIONS;
     }
 }

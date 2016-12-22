@@ -20,6 +20,7 @@ import static android.content.Context.SENSOR_SERVICE;
 
 public class SensorsCollector {
     private static final String TAG = "SensorCollector";
+    private static final String[] PERMISSIONS = {};
     private Map<Integer, ArrayList<SensorData>> results;
     private Context mContext;
     private int[] mTypeSensors;
@@ -102,5 +103,9 @@ public class SensorsCollector {
 
     public Map<Integer, ArrayList<SensorData>> getResult() {
         return results;
+    }
+
+    public static String[] getPermissions() {
+        return PERMISSIONS;
     }
 }

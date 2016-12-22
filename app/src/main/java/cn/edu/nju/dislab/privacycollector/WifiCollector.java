@@ -1,5 +1,6 @@
 package cn.edu.nju.dislab.privacycollector;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +17,7 @@ import java.util.List;
 
 public class WifiCollector {
     private static final String TAG = "WifiCollector";
+    private static final String[] PERMISSIONS = {Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.CHANGE_WIFI_STATE};
     private WifiManager mWifiManager;
     private Context mContext;
     private List<ScanResult> scanResults;
@@ -72,5 +74,9 @@ public class WifiCollector {
 
     public List<ScanResult> getResult() {
         return scanResults;
+    }
+
+    public static String[] getPermissions() {
+        return PERMISSIONS;
     }
 }

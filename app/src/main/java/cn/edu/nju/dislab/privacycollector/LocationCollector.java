@@ -1,6 +1,7 @@
 package cn.edu.nju.dislab.privacycollector;
 
 
+import android.Manifest;
 import android.content.Context;
 import android.util.Log;
 
@@ -15,6 +16,7 @@ import com.amap.api.location.AMapLocationListener;
 
 public class LocationCollector {
     private static final String TAG = "LocationCollector";
+    private static final String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.INTERNET};
     private AMapLocationClient mLocationClient = null;
     private Context mContext;
     private final Object LOCK = new Object();
@@ -66,5 +68,9 @@ public class LocationCollector {
 
     public AMapLocation getResult() {
         return result;
+    }
+
+    public static String[] getPermissions() {
+        return PERMISSIONS;
     }
 }

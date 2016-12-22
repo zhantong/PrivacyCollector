@@ -1,5 +1,6 @@
 package cn.edu.nju.dislab.privacycollector;
 
+import android.Manifest;
 import android.media.MediaRecorder;
 import android.os.Handler;
 import android.util.Log;
@@ -13,6 +14,7 @@ import java.util.List;
 
 public class AudioCollector {
     private static final String TAG = "AudioCollector";
+    private static final String[] PERMISSIONS = {Manifest.permission.RECORD_AUDIO};
     private static final int POLL_INTERVAL = 100;
     private static final int MAX_TICKS = 15;
     private Handler mHandler;
@@ -85,5 +87,9 @@ public class AudioCollector {
 
     public List<Double> getResult() {
         return results;
+    }
+
+    public static String[] getPermissions() {
+        return PERMISSIONS;
     }
 }

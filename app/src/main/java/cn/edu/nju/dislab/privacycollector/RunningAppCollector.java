@@ -1,5 +1,6 @@
 package cn.edu.nju.dislab.privacycollector;
 
+import android.Manifest;
 import android.app.ActivityManager;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
@@ -15,6 +16,8 @@ import java.util.List;
 
 public class RunningAppCollector {
     private static final String TAG = "RunningAppCollector";
+    private static final String[] PERMISSIONS_LESS_L = {Manifest.permission.GET_TASKS};
+    private static final String[] PERMISSIONS_EG_L = {Manifest.permission.PACKAGE_USAGE_STATS};
     private Context mContext;
     private ActivityManager mActivityManager;
     private UsageStatsManager mUsageStatsManager;
@@ -73,5 +76,13 @@ public class RunningAppCollector {
 
     public List<String> getResult() {
         return results;
+    }
+
+    public static String[] getPermissions() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            return PERMISSIONS_EG_L;
+        } else {
+            return PERMISSIONS_LESS_L;
+        }
     }
 }

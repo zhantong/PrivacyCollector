@@ -1,5 +1,6 @@
 package cn.edu.nju.dislab.privacycollector;
 
+import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
@@ -15,6 +16,7 @@ import java.util.List;
 
 public class ContactCollector {
     private static final String TAG = "ContactCollector";
+    private static final String[] PERMISSIONS = {Manifest.permission.READ_CONTACTS};
     private Context mContext;
     private ContentResolver mContentResolver;
     private List<String[]> results;
@@ -52,5 +54,9 @@ public class ContactCollector {
 
     public List<String[]> getResult() {
         return results;
+    }
+
+    public static String[] getPermissions() {
+        return PERMISSIONS;
     }
 }
