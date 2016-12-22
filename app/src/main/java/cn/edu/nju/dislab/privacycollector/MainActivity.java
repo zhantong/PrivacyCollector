@@ -19,27 +19,28 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        startLocationCollector();
-    }
-
-    private void startWifiCollector() {
-        final WifiCollector wifiCollector = new WifiCollector();
         new Thread(new Runnable() {
             @Override
             public void run() {
-                wifiCollector.collect();
-                List<ScanResult> scanResults = wifiCollector.getResult();
-                Log.i(TAG, scanResults.toString());
+                startCollect();
             }
         }).start();
     }
 
-    private void startContactCollector() {
-        final ContactCollector contactCollector = new ContactCollector();
-        new Thread(new Runnable() {
+    public void startCollect() {
+        Thread wifiCollectorThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                WifiCollector wifiCollector = new WifiCollector();
+                wifiCollector.collect();
+                List<ScanResult> scanResults = wifiCollector.getResult();
+                Log.i(TAG, scanResults.toString());
+            }
+        });
+        Thread contactCollectorThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ContactCollector contactCollector = new ContactCollector();
                 contactCollector.collect();
                 List<String[]> results = contactCollector.getResult();
                 if (results != null) {
@@ -48,14 +49,11 @@ public class MainActivity extends Activity {
                     }
                 }
             }
-        }).start();
-    }
-
-    private void startCallLogCollector() {
-        final CallLogCollector callLogCollector = new CallLogCollector();
-        new Thread(new Runnable() {
+        });
+        Thread callLogCollectorThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                CallLogCollector callLogCollector = new CallLogCollector();
                 callLogCollector.collect();
                 List<String[]> results = callLogCollector.getResult();
                 if (results != null) {
@@ -64,42 +62,33 @@ public class MainActivity extends Activity {
                     }
                 }
             }
-        }).start();
-    }
-
-    private void startAudioCollector() {
-        final AudioCollector audioCollector = new AudioCollector();
-        new Thread(new Runnable() {
+        });
+        Thread audioCollectorThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                AudioCollector audioCollector = new AudioCollector();
                 audioCollector.collect();
                 List<Double> results = audioCollector.getResult();
                 if (results != null) {
                     Log.i(TAG, results.toString());
                 }
             }
-        }).start();
-    }
-
-    private void startLocationCollector() {
-        final LocationCollector locationCollector = new LocationCollector();
-        new Thread(new Runnable() {
+        });
+        Thread locationCollectorThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                LocationCollector locationCollector = new LocationCollector();
                 locationCollector.collect();
                 AMapLocation result = locationCollector.getResult();
                 if (result != null) {
                     Log.i(TAG, "location: " + result.getErrorCode() + " " + result.getErrorInfo() + "\n" + result.getAddress());
                 }
             }
-        }).start();
-    }
-
-    private void startSmsCollector() {
-        final SmsCollector smsCollector = new SmsCollector();
-        new Thread(new Runnable() {
+        });
+        Thread smsCollectorThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                SmsCollector smsCollector = new SmsCollector();
                 smsCollector.collect();
                 List<String[]> results = smsCollector.getResult();
                 if (results != null) {
@@ -108,16 +97,13 @@ public class MainActivity extends Activity {
                     }
                 }
             }
-        }).start();
-    }
-
-    private void startSensorsCollector() {
-        int[] typeSensors = new int[]{Sensor.TYPE_GYROSCOPE, Sensor.TYPE_MAGNETIC_FIELD, Sensor.TYPE_LIGHT, Sensor.TYPE_ACCELEROMETER};
-        long[] maxTimes = new long[]{100000000, 100000000, 100000000, 100000000};
-        final SensorsCollector sensorsCollector = new SensorsCollector(typeSensors, maxTimes);
-        new Thread(new Runnable() {
+        });
+        Thread sensorCollectorThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                int[] typeSensors = new int[]{Sensor.TYPE_GYROSCOPE, Sensor.TYPE_MAGNETIC_FIELD, Sensor.TYPE_LIGHT, Sensor.TYPE_ACCELEROMETER};
+                long[] maxTimes = new long[]{100000000, 100000000, 100000000, 100000000};
+                final SensorsCollector sensorsCollector = new SensorsCollector(typeSensors, maxTimes);
                 sensorsCollector.collect();
                 Map<Integer, ArrayList<SensorData>> results = sensorsCollector.getResult();
                 if (results != null) {
@@ -130,44 +116,50 @@ public class MainActivity extends Activity {
                     }
                 }
             }
-        }).start();
-    }
-
-    private void startScreenCollector() {
-        final ScreenCollector screenCollector = new ScreenCollector();
-        new Thread(new Runnable() {
+        });
+        Thread screenCollectorThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                ScreenCollector screenCollector = new ScreenCollector();
                 screenCollector.collect();
                 boolean result = screenCollector.getResult();
                 Log.i(TAG, "is screen on: " + result);
             }
-        }).start();
-    }
-
-    private void startForegroundAppCollector() {
-        final ForegroundAppCollector foregroundAppCollector = new ForegroundAppCollector();
-        new Thread(new Runnable() {
+        });
+        Thread foregroundAppCollectorThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                ForegroundAppCollector foregroundAppCollector = new ForegroundAppCollector();
                 foregroundAppCollector.collect();
                 String result = foregroundAppCollector.getResult();
                 Log.i(TAG, "foreground app: " + result);
             }
-        }).start();
-    }
-
-    private void startRunningAppCollector() {
-        final RunningAppCollector runningAppCollector = new RunningAppCollector();
-        new Thread(new Runnable() {
+        });
+        Thread runningAppCollectorThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                RunningAppCollector runningAppCollector = new RunningAppCollector();
                 runningAppCollector.collect();
                 List<String> results = runningAppCollector.getResult();
                 if (results != null) {
                     Log.i(TAG, "running apps: " + results.toString());
                 }
             }
-        }).start();
+        });
+
+        Thread[] threads = new Thread[]{wifiCollectorThread, contactCollectorThread, callLogCollectorThread,
+                audioCollectorThread, locationCollectorThread, smsCollectorThread, sensorCollectorThread,
+                screenCollectorThread, foregroundAppCollectorThread, runningAppCollectorThread};
+        for (Thread thread : threads) {
+            thread.start();
+        }
+        for (Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        Log.i(TAG, "all done");
     }
 }

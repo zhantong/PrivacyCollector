@@ -3,6 +3,7 @@ package cn.edu.nju.dislab.privacycollector;
 import android.Manifest;
 import android.media.MediaRecorder;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class AudioCollector {
     };
 
     public AudioCollector() {
-        mHandler = new Handler();
+        mHandler = new Handler(Looper.getMainLooper());
     }
 
     private void stop() {
