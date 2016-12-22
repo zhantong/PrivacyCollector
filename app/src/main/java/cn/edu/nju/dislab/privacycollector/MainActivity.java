@@ -6,7 +6,7 @@ import android.net.wifi.ScanResult;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.baidu.location.BDLocation;
+import com.amap.api.location.AMapLocation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        startRunningAppCollector();
+        startLocationCollector();
     }
 
     private void startWifiCollector() {
@@ -81,15 +81,15 @@ public class MainActivity extends Activity {
         }).start();
     }
 
-    private void startGpsCollector() {
+    private void startLocationCollector() {
         final LocationCollector locationCollector = new LocationCollector();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 locationCollector.collect();
-                BDLocation result = locationCollector.getResult();
+                AMapLocation result = locationCollector.getResult();
                 if (result != null) {
-                    Log.i(TAG, "loc type: " + result.getLocType() + " （161： 网络定位结果，网络定位成功。）");
+                    Log.i(TAG, "location: " + result.getErrorCode() + " " + result.getErrorInfo() + "\n" + result.getAddress());
                 }
             }
         }).start();
