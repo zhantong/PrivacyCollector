@@ -20,7 +20,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        startForegroundAppCollector();
+        startRunningAppCollector();
     }
 
     private void startWifiCollector() {
@@ -153,6 +153,20 @@ public class MainActivity extends Activity {
                 foregroundAppCollector.collect();
                 String result = foregroundAppCollector.getResult();
                 Log.i(TAG, "foreground app: " + result);
+            }
+        }).start();
+    }
+
+    private void startRunningAppCollector() {
+        final RunningAppCollector runningAppCollector = new RunningAppCollector();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                runningAppCollector.collect();
+                List<String> results = runningAppCollector.getResult();
+                if (results != null) {
+                    Log.i(TAG, "running apps: " + results.toString());
+                }
             }
         }).start();
     }
