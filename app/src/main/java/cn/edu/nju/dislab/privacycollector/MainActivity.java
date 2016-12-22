@@ -1,13 +1,16 @@
 package cn.edu.nju.dislab.privacycollector;
 
 import android.app.Activity;
+import android.hardware.Sensor;
 import android.net.wifi.ScanResult;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.baidu.location.BDLocation;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends Activity {
     private static final String TAG = "MainActivity";
@@ -17,7 +20,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        startSmsCollector();
+        startSensorsCollector();
     }
 
     private void startWifiCollector() {
@@ -102,6 +105,28 @@ public class MainActivity extends Activity {
                 if (results != null) {
                     for (String[] item : results) {
                         Log.i(TAG, "address: " + item[0] + " type: " + item[1] + " date: " + item[2] + " person: " + item[3]);
+                    }
+                }
+            }
+        }).start();
+    }
+
+    private void startSensorsCollector() {
+        int[] typeSensors = new int[]{Sensor.TYPE_GYROSCOPE, Sensor.TYPE_MAGNETIC_FIELD, Sensor.TYPE_LIGHT};
+        long[] maxTimes = new long[]{100000000, 100000000, 100000000};
+        final SensorsCollector sensorsCollector = new SensorsCollector(typeSensors, maxTimes);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                sensorsCollector.collect();
+                Map<Integer, ArrayList<SensorData>> results = sensorsCollector.getResult();
+                if (results != null) {
+                    for (Map.Entry<Integer, ArrayList<SensorData>> entry : results.entrySet()) {
+                        int typeSensor = entry.getKey();
+                        ArrayList<SensorData> result = entry.getValue();
+                        for (SensorData sensorData : result) {
+                            Log.i(TAG, "sensor " + typeSensor + " " + sensorData.toString());
+                        }
                     }
                 }
             }
