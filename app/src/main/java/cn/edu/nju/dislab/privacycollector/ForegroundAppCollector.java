@@ -28,24 +28,19 @@ public class ForegroundAppCollector {
         mContext = context;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             mUsageStatsManager = (UsageStatsManager) mContext.getSystemService(Context.USAGE_STATS_SERVICE);
-            if (mUsageStatsManager == null) {
-                Log.i(TAG, "null UsageStatsManager");
-                throw new RuntimeException();
-            }
             Log.i(TAG, "using UsageStatsManager");
         } else {
             mActivityManager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
-            if (mActivityManager == null) {
-                Log.i(TAG, "null ActivityManager");
-                throw new RuntimeException();
-            }
             Log.i(TAG, "using ActivityManager");
         }
 
     }
 
-    public void collect() {
+    public int collect() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            if (!EasyPermissions.hasPermissions(PERMISSIONS_EG_L)) {
+                return Collector.NO_PERMISSION;
+            }
             long INTERVAL = 10 * 1000;
             long currentTimeMillis = System.currentTimeMillis();
             UsageEvents usageEvents = mUsageStatsManager.queryEvents(currentTimeMillis - INTERVAL, currentTimeMillis + INTERVAL);
@@ -62,7 +57,7 @@ public class ForegroundAppCollector {
             }
             if (foregroundApp == null) {
                 Log.i(TAG, "no foreground app");
-                return;
+                return Collector.COLLECT_FAILED;
             }
             result = foregroundApp;
         } else {
@@ -72,14 +67,15 @@ public class ForegroundAppCollector {
             } catch (Exception e) {
                 Log.i(TAG, "error when getting foregroundTaskInfo");
                 e.printStackTrace();
-                return;
+                return Collector.NO_PERMISSION;
             }
             if (foregroundTaskInfo == null) {
                 Log.i(TAG, "null foregroundTaskInfo");
-                return;
+                return Collector.COLLECT_FAILED;
             }
             result = foregroundTaskInfo.baseActivity.getPackageName();
         }
+        return Collector.COLLECT_SUCCESS;
     }
 
     public String getResult() {

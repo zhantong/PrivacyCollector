@@ -35,7 +35,7 @@ public class ScreenCollector {
         }
     }
 
-    public void collect() {
+    public int collect() {
         result = false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             for (Display display : mDisplayManager.getDisplays()) {
@@ -46,6 +46,7 @@ public class ScreenCollector {
         } else {
             result = mPowerManager.isScreenOn();
         }
+        return Collector.COLLECT_SUCCESS;
     }
 
     public boolean getResult() {

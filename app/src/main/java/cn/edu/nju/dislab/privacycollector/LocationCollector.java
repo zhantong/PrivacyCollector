@@ -16,7 +16,7 @@ import com.amap.api.location.AMapLocationListener;
 
 public class LocationCollector {
     private static final String TAG = "LocationCollector";
-    private static final String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.INTERNET};
+    private static final String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.INTERNET, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE};
     private AMapLocationClient mLocationClient = null;
     private Context mContext;
     private final Object LOCK = new Object();
@@ -41,7 +41,10 @@ public class LocationCollector {
         mLocationClient.setLocationListener(mLocationListener);
     }
 
-    public void collect() {
+    public int collect() {
+        if (!EasyPermissions.hasPermissions(PERMISSIONS)) {
+            return Collector.NO_PERMISSION;
+        }
         AMapLocationClientOption locationClientOption = new AMapLocationClientOption();
         locationClientOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
         //locationClientOption.setOnceLocation(true);
@@ -57,13 +60,14 @@ public class LocationCollector {
                 LOCK.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                return;
+                return Collector.COLLECT_FAILED;
             }
         }
 
         mLocationClient.unRegisterLocationListener(mLocationListener);
         mLocationClient.stopLocation();
         mLocationClient.onDestroy();
+        return Collector.COLLECT_SUCCESS;
     }
 
     public AMapLocation getResult() {

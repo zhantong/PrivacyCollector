@@ -30,12 +30,20 @@ public class CallLogCollector {
         mContentResolver = mContext.getContentResolver();
     }
 
-    public void collect() {
-        Cursor cursor = mContentResolver.query(CallLog.Calls.CONTENT_URI, null, null, null, null);
-        Log.i(TAG, "start: " + cursor.toString());
+    public int collect() {
+        if (!EasyPermissions.hasPermissions(PERMISSIONS)) {
+            return Collector.NO_PERMISSION;
+        }
+        Cursor cursor;
+        try {
+            cursor = mContentResolver.query(CallLog.Calls.CONTENT_URI, null, null, null, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collector.NO_PERMISSION;
+        }
         if (cursor == null) {
             Log.i(TAG, "null cursor");
-            return;
+            return Collector.NO_PERMISSION;
         }
         if (cursor.getCount() > 0) {
             results = new ArrayList<>();
@@ -48,10 +56,10 @@ public class CallLogCollector {
             }
         } else {
             Log.i(TAG, "empty cursor");
-            return;
+            return Collector.COLLECT_FAILED;
         }
-        Log.i(TAG, "end: " + cursor.toString());
         cursor.close();
+        return Collector.COLLECT_SUCCESS;
     }
 
     public List<String[]> getResult() {

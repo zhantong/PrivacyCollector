@@ -14,28 +14,36 @@ import java.util.List;
  * Created by zhantong on 2016/12/21.
  */
 
-public class SmsColletor {
+public class SmsCollector {
     private static final String TAG = "SmsCollector";
     private static final String[] PERMISSIONS = {Manifest.permission.READ_SMS};
     private Context mContext;
     private ContentResolver mContentResolver;
     private List<String[]> results;
 
-    public SmsColletor() {
+    public SmsCollector() {
         this(MainApplication.getContext());
     }
 
-    public SmsColletor(Context context) {
+    public SmsCollector(Context context) {
         mContext = context;
         mContentResolver = mContext.getContentResolver();
     }
 
-    public void collect() {
-        Cursor cursor = mContentResolver.query(Telephony.Sms.Inbox.CONTENT_URI, null, null, null, null);
-        Log.i(TAG, "start: " + cursor.toString());
+    public int collect() {
+        if (!EasyPermissions.hasPermissions(PERMISSIONS)) {
+            return Collector.NO_PERMISSION;
+        }
+        Cursor cursor;
+        try {
+            cursor = mContentResolver.query(Telephony.Sms.Inbox.CONTENT_URI, null, null, null, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collector.NO_PERMISSION;
+        }
         if (cursor == null) {
             Log.i(TAG, "null cursor");
-            return;
+            return Collector.NO_PERMISSION;
         }
         if (cursor.getCount() > 0) {
             results = new ArrayList<>();
@@ -48,10 +56,10 @@ public class SmsColletor {
             }
         } else {
             Log.i(TAG, "empty cursor");
-            return;
+            return Collector.COLLECT_FAILED;
         }
-        Log.i(TAG, "end: " + cursor.toString());
         cursor.close();
+        return Collector.COLLECT_SUCCESS;
     }
 
     public List<String[]> getResult() {

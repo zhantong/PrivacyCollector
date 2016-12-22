@@ -76,7 +76,7 @@ public class SensorsCollector {
         }
     }
 
-    public void collect() {
+    public int collect() {
         List<Sensor> sensors = new ArrayList<>();
         mIsDone = new HashMap<>();
         for (int typeSensor : mTypeSensors) {
@@ -89,16 +89,16 @@ public class SensorsCollector {
                 Log.i(TAG, "sensor " + typeSensor + " not exists");
             }
         }
-        Log.i(TAG, "before lock");
         synchronized (LOCK) {
             try {
                 LOCK.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                return;
+                return Collector.COLLECT_FAILED;
             }
         }
         mSensorManager.unregisterListener(sensorEventListener);
+        return Collector.COLLECT_SUCCESS;
     }
 
     public Map<Integer, ArrayList<SensorData>> getResult() {

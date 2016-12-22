@@ -51,7 +51,10 @@ public class AudioCollector {
         }
     }
 
-    public void collect() {
+    public int collect() {
+        if (!EasyPermissions.hasPermissions(PERMISSIONS)) {
+            return Collector.NO_PERMISSION;
+        }
         try {
             mRecorder = new MediaRecorder();
             mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -63,7 +66,7 @@ public class AudioCollector {
         } catch (Exception e) {
             Log.i(TAG, "unable to record audio");
             e.printStackTrace();
-            return;
+            return Collector.NO_PERMISSION;
         }
         mTickCount = 0;
         results = new ArrayList<>();
@@ -73,9 +76,10 @@ public class AudioCollector {
                 LOCK.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                return;
+                return Collector.COLLECT_FAILED;
             }
         }
+        return Collector.COLLECT_SUCCESS;
     }
 
     public double getAmplitude() {

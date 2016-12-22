@@ -96,12 +96,12 @@ public class MainActivity extends Activity {
     }
 
     private void startSmsCollector() {
-        final SmsColletor smsColletor = new SmsColletor();
+        final SmsCollector smsCollector = new SmsCollector();
         new Thread(new Runnable() {
             @Override
             public void run() {
-                smsColletor.collect();
-                List<String[]> results = smsColletor.getResult();
+                smsCollector.collect();
+                List<String[]> results = smsCollector.getResult();
                 if (results != null) {
                     for (String[] item : results) {
                         Log.i(TAG, "address: " + item[0] + " type: " + item[1] + " date: " + item[2] + " person: " + item[3]);
@@ -112,8 +112,8 @@ public class MainActivity extends Activity {
     }
 
     private void startSensorsCollector() {
-        int[] typeSensors = new int[]{Sensor.TYPE_GYROSCOPE, Sensor.TYPE_MAGNETIC_FIELD, Sensor.TYPE_LIGHT};
-        long[] maxTimes = new long[]{100000000, 100000000, 100000000};
+        int[] typeSensors = new int[]{Sensor.TYPE_GYROSCOPE, Sensor.TYPE_MAGNETIC_FIELD, Sensor.TYPE_LIGHT, Sensor.TYPE_ACCELEROMETER};
+        long[] maxTimes = new long[]{100000000, 100000000, 100000000, 100000000};
         final SensorsCollector sensorsCollector = new SensorsCollector(typeSensors, maxTimes);
         new Thread(new Runnable() {
             @Override

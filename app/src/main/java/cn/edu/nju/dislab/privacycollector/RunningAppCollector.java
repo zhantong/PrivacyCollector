@@ -31,27 +31,25 @@ public class RunningAppCollector {
         mContext = context;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             mUsageStatsManager = (UsageStatsManager) mContext.getSystemService(Context.USAGE_STATS_SERVICE);
-            if (mUsageStatsManager == null) {
-                Log.i(TAG, "null UsageStatsManager");
-                throw new RuntimeException();
-            }
             Log.i(TAG, "using UsageStatsManager");
         } else {
             mActivityManager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
-            if (mActivityManager == null) {
-                Log.i(TAG, "null ActivityManager");
-                throw new RuntimeException();
-            }
             Log.i(TAG, "using ActivityManager");
         }
     }
 
-    public void collect() {
+    public int collect() {
         results = new ArrayList<>();
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            if (!EasyPermissions.hasPermissions(PERMISSIONS_EG_L)) {
+                return Collector.NO_PERMISSION;
+            }
             long INTERVAL = 30 * 60 * 1000;
             long currentTimeMillis = System.currentTimeMillis();
             List<UsageStats> usageStatses = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, currentTimeMillis - INTERVAL, currentTimeMillis + INTERVAL);
+            if (usageStatses == null || usageStatses.isEmpty()) {
+                return Collector.COLLECT_FAILED;
+            }
             for (UsageStats usageStats : usageStatses) {
                 results.add(usageStats.getPackageName());
             }
@@ -62,16 +60,20 @@ public class RunningAppCollector {
             } catch (Exception e) {
                 Log.i(TAG, "error when getting runningTaskInfos");
                 e.printStackTrace();
-                return;
+                return Collector.NO_PERMISSION;
             }
             if (runningTaskInfos == null) {
                 Log.i(TAG, "null runningTaskInfos");
-                return;
+                return Collector.NO_PERMISSION;
+            }
+            if (runningTaskInfos.isEmpty()) {
+                return Collector.COLLECT_FAILED;
             }
             for (ActivityManager.RunningTaskInfo runningTaskInfo : runningTaskInfos) {
                 results.add(runningTaskInfo.baseActivity.getPackageName());
             }
         }
+        return Collector.COLLECT_SUCCESS;
     }
 
     public List<String> getResult() {

@@ -29,27 +29,32 @@ public class WifiCollector {
     public WifiCollector(Context context) {
         mContext = context;
         mWifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-        if (mWifiManager == null) {
-            Log.i(TAG, "null WifiManager");
-            throw new RuntimeException();
-        }
     }
 
-    public void collect() {
+    public int collect() {
+        if (!EasyPermissions.hasPermissions(PERMISSIONS)) {
+            return Collector.NO_PERMISSION;
+        }
         boolean originIsWifiEnabled = mWifiManager.isWifiEnabled();
         if (!originIsWifiEnabled) {
-            boolean isEnableWifiSuccess = false;
+            boolean isEnableWifiSuccess;
             try {
                 isEnableWifiSuccess = mWifiManager.setWifiEnabled(true);
             } catch (Exception e) {
                 e.printStackTrace();
+                return Collector.NO_PERMISSION;
             }
             if (!isEnableWifiSuccess) {
                 Log.i(TAG, "failed to enable wifi");
-                return;
+                return Collector.COLLECT_FAILED;
             }
         }
-        mWifiManager.startScan();
+        try {
+            mWifiManager.startScan();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collector.NO_PERMISSION;
+        }
         Log.i(TAG, "scan started");
         final Object scanFinished = new Object();
         mContext.registerReceiver(new BroadcastReceiver() {
@@ -66,10 +71,11 @@ public class WifiCollector {
                 scanFinished.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                return;
+                return Collector.COLLECT_FAILED;
             }
             scanResults = mWifiManager.getScanResults();
         }
+        return Collector.COLLECT_SUCCESS;
     }
 
     public List<ScanResult> getResult() {
