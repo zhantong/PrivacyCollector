@@ -1,4 +1,4 @@
-package cn.edu.nju.dislab.privacycollector;
+package cn.edu.nju.dislab.privacycollector.collectors;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import cn.edu.nju.dislab.privacycollector.MainApplication;
 
 import static android.content.Context.SENSOR_SERVICE;
 

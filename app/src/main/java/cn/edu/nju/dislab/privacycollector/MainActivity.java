@@ -6,6 +6,29 @@ import android.hardware.Sensor;
 import android.os.Bundle;
 import android.util.Log;
 
+import cn.edu.nju.dislab.privacycollector.collectors.AudioCollector;
+import cn.edu.nju.dislab.privacycollector.collectors.AudioData;
+import cn.edu.nju.dislab.privacycollector.collectors.CallLogCollector;
+import cn.edu.nju.dislab.privacycollector.collectors.CallLogData;
+import cn.edu.nju.dislab.privacycollector.collectors.ContactCollector;
+import cn.edu.nju.dislab.privacycollector.collectors.ContactData;
+import cn.edu.nju.dislab.privacycollector.collectors.ForegroundAppCollector;
+import cn.edu.nju.dislab.privacycollector.collectors.ForegroundAppData;
+import cn.edu.nju.dislab.privacycollector.collectors.LocationCollector;
+import cn.edu.nju.dislab.privacycollector.collectors.LocationData;
+import cn.edu.nju.dislab.privacycollector.collectors.PhoneCollector;
+import cn.edu.nju.dislab.privacycollector.collectors.PhoneData;
+import cn.edu.nju.dislab.privacycollector.collectors.RunningAppCollector;
+import cn.edu.nju.dislab.privacycollector.collectors.RunningAppData;
+import cn.edu.nju.dislab.privacycollector.collectors.ScreenCollector;
+import cn.edu.nju.dislab.privacycollector.collectors.ScreenData;
+import cn.edu.nju.dislab.privacycollector.collectors.SensorsCollector;
+import cn.edu.nju.dislab.privacycollector.collectors.SensorsData;
+import cn.edu.nju.dislab.privacycollector.collectors.SmsCollector;
+import cn.edu.nju.dislab.privacycollector.collectors.SmsData;
+import cn.edu.nju.dislab.privacycollector.collectors.WifiCollector;
+import cn.edu.nju.dislab.privacycollector.collectors.WifiData;
+
 public class MainActivity extends Activity {
     private static final String TAG = "MainActivity";
 

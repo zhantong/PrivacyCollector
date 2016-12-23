@@ -1,4 +1,4 @@
-package cn.edu.nju.dislab.privacycollector;
+package cn.edu.nju.dislab.privacycollector.collectors;
 
 
 import android.Manifest;
@@ -8,6 +8,9 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+
+import cn.edu.nju.dislab.privacycollector.EasyPermissions;
+import cn.edu.nju.dislab.privacycollector.MainApplication;
 
 /**
  * Created by zhantong on 2016/12/21.

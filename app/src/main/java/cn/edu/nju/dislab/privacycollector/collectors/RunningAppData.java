@@ -1,4 +1,4 @@
-package cn.edu.nju.dislab.privacycollector;
+package cn.edu.nju.dislab.privacycollector.collectors;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;

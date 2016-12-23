@@ -1,28 +1,31 @@
-package cn.edu.nju.dislab.privacycollector;
+package cn.edu.nju.dislab.privacycollector.collectors;
 
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
-import android.provider.CallLog;
+import android.provider.ContactsContract;
 import android.util.Log;
+
+import cn.edu.nju.dislab.privacycollector.EasyPermissions;
+import cn.edu.nju.dislab.privacycollector.MainApplication;
 
 /**
  * Created by zhantong on 2016/12/21.
  */
 
-public class CallLogCollector {
+public class ContactCollector {
     private static final String TAG = "ContactCollector";
-    private static final String[] PERMISSIONS = {Manifest.permission.READ_CALL_LOG};
+    private static final String[] PERMISSIONS = {Manifest.permission.READ_CONTACTS};
     private Context mContext;
     private ContentResolver mContentResolver;
-    private CallLogData result;
+    private ContactData result;
 
-    public CallLogCollector() {
+    public ContactCollector() {
         this(MainApplication.getContext());
     }
 
-    public CallLogCollector(Context context) {
+    public ContactCollector(Context context) {
         mContext = context;
         mContentResolver = mContext.getContentResolver();
     }
@@ -31,25 +34,17 @@ public class CallLogCollector {
         if (!EasyPermissions.hasPermissions(PERMISSIONS)) {
             return Collector.NO_PERMISSION;
         }
-        Cursor cursor;
-        try {
-            cursor = mContentResolver.query(CallLog.Calls.CONTENT_URI, null, null, null, null);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Collector.NO_PERMISSION;
-        }
+        Cursor cursor = mContentResolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
         if (cursor == null) {
             Log.i(TAG, "null cursor");
             return Collector.NO_PERMISSION;
         }
         if (cursor.getCount() > 0) {
-            result = new CallLogData();
+            result = new ContactData();
             while (cursor.moveToNext()) {
-                String number = cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER));
-                String type = cursor.getString(cursor.getColumnIndex(CallLog.Calls.TYPE));
-                String date = cursor.getString(cursor.getColumnIndex(CallLog.Calls.DATE));
-                String duration = cursor.getString(cursor.getColumnIndex(CallLog.Calls.DURATION));
-                result.put(number, type, date, duration);
+                String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                result.put(name, number);
             }
         } else {
             Log.i(TAG, "empty cursor");
@@ -59,7 +54,7 @@ public class CallLogCollector {
         return Collector.COLLECT_SUCCESS;
     }
 
-    public CallLogData getResult() {
+    public ContactData getResult() {
         return result;
     }
 

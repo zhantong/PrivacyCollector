@@ -1,8 +1,11 @@
-package cn.edu.nju.dislab.privacycollector;
+package cn.edu.nju.dislab.privacycollector.collectors;
 
 import android.Manifest;
 import android.content.Context;
 import android.telephony.TelephonyManager;
+
+import cn.edu.nju.dislab.privacycollector.EasyPermissions;
+import cn.edu.nju.dislab.privacycollector.MainApplication;
 
 /**
  * Created by zhantong on 2016/12/23.

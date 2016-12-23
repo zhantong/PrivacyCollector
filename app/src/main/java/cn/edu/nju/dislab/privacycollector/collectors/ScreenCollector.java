@@ -1,4 +1,4 @@
-package cn.edu.nju.dislab.privacycollector;
+package cn.edu.nju.dislab.privacycollector.collectors;
 
 import android.content.Context;
 import android.hardware.display.DisplayManager;
@@ -6,6 +6,8 @@ import android.os.Build;
 import android.os.PowerManager;
 import android.util.Log;
 import android.view.Display;
+
+import cn.edu.nju.dislab.privacycollector.MainApplication;
 
 import static android.content.Context.POWER_SERVICE;
 

@@ -1,4 +1,4 @@
-package cn.edu.nju.dislab.privacycollector;
+package cn.edu.nju.dislab.privacycollector.collectors;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
@@ -7,6 +7,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
 import android.util.Log;
+
+import cn.edu.nju.dislab.privacycollector.EasyPermissions;
+import cn.edu.nju.dislab.privacycollector.MainApplication;
 
 /**
  * Created by zhantong on 2016/12/21.

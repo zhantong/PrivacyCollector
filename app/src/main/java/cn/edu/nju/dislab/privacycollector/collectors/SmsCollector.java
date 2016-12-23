@@ -1,4 +1,4 @@
-package cn.edu.nju.dislab.privacycollector;
+package cn.edu.nju.dislab.privacycollector.collectors;
 
 import android.Manifest;
 import android.content.ContentResolver;
@@ -6,6 +6,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.provider.Telephony;
 import android.util.Log;
+
+import cn.edu.nju.dislab.privacycollector.EasyPermissions;
+import cn.edu.nju.dislab.privacycollector.MainApplication;
 
 /**
  * Created by zhantong on 2016/12/21.
