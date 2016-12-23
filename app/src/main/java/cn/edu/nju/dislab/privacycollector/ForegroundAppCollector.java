@@ -18,7 +18,7 @@ public class ForegroundAppCollector {
     private Context mContext;
     private ActivityManager mActivityManager;
     private UsageStatsManager mUsageStatsManager;
-    private String result;
+    private ForegroundAppData result;
 
     public ForegroundAppCollector() {
         this(MainApplication.getContext());
@@ -59,7 +59,7 @@ public class ForegroundAppCollector {
                 Log.i(TAG, "no foreground app");
                 return Collector.COLLECT_FAILED;
             }
-            result = foregroundApp;
+            result = new ForegroundAppData(foregroundApp, System.currentTimeMillis());
         } else {
             ActivityManager.RunningTaskInfo foregroundTaskInfo;
             try {
@@ -73,12 +73,13 @@ public class ForegroundAppCollector {
                 Log.i(TAG, "null foregroundTaskInfo");
                 return Collector.COLLECT_FAILED;
             }
-            result = foregroundTaskInfo.baseActivity.getPackageName();
+            String foregroundApp = foregroundTaskInfo.baseActivity.getPackageName();
+            result = new ForegroundAppData(foregroundApp, System.currentTimeMillis());
         }
         return Collector.COLLECT_SUCCESS;
     }
 
-    public String getResult() {
+    public ForegroundAppData getResult() {
         return result;
     }
 

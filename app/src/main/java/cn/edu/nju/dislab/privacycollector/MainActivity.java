@@ -1,6 +1,7 @@
 package cn.edu.nju.dislab.privacycollector;
 
 import android.app.Activity;
+import android.database.sqlite.SQLiteDatabase;
 import android.hardware.Sensor;
 import android.net.wifi.ScanResult;
 import android.os.Bundle;
@@ -28,13 +29,16 @@ public class MainActivity extends Activity {
     }
 
     public void startCollect() {
+        DbHelper dbHelper = new DbHelper();
+        final SQLiteDatabase db = dbHelper.getWritableDatabase();
         Thread wifiCollectorThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 WifiCollector wifiCollector = new WifiCollector();
                 wifiCollector.collect();
-                List<ScanResult> scanResults = wifiCollector.getResult();
-                Log.i(TAG, scanResults.toString());
+                List<ScanResult> results = wifiCollector.getResult();
+                CollectorToDb.writeWifi(db, results);
+                Log.i(TAG, results.toString());
             }
         });
         Thread contactCollectorThread = new Thread(new Runnable() {
@@ -42,11 +46,10 @@ public class MainActivity extends Activity {
             public void run() {
                 ContactCollector contactCollector = new ContactCollector();
                 contactCollector.collect();
-                List<String[]> results = contactCollector.getResult();
+                List<ContactData> results = contactCollector.getResult();
+                CollectorToDb.writeContact(db, results);
                 if (results != null) {
-                    for (String[] item : results) {
-                        Log.i(TAG, "name: " + item[0] + " number: " + item[1]);
-                    }
+                    Log.i(TAG, results.toString());
                 }
             }
         });
@@ -55,11 +58,10 @@ public class MainActivity extends Activity {
             public void run() {
                 CallLogCollector callLogCollector = new CallLogCollector();
                 callLogCollector.collect();
-                List<String[]> results = callLogCollector.getResult();
+                List<CallLogData> results = callLogCollector.getResult();
+                CollectorToDb.writeCallLog(db, results);
                 if (results != null) {
-                    for (String[] item : results) {
-                        Log.i(TAG, "number: " + item[0] + " type: " + item[1] + " date: " + item[2] + " duration: " + item[3]);
-                    }
+                    Log.i(TAG, results.toString());
                 }
             }
         });
@@ -68,7 +70,8 @@ public class MainActivity extends Activity {
             public void run() {
                 AudioCollector audioCollector = new AudioCollector();
                 audioCollector.collect();
-                List<Double> results = audioCollector.getResult();
+                List<AudioData> results = audioCollector.getResult();
+                CollectorToDb.writeAudio(db, results);
                 if (results != null) {
                     Log.i(TAG, results.toString());
                 }
@@ -80,6 +83,7 @@ public class MainActivity extends Activity {
                 LocationCollector locationCollector = new LocationCollector();
                 locationCollector.collect();
                 AMapLocation result = locationCollector.getResult();
+                CollectorToDb.writeLocation(db, result);
                 if (result != null) {
                     Log.i(TAG, "location: " + result.getErrorCode() + " " + result.getErrorInfo() + "\n" + result.getAddress());
                 }
@@ -90,11 +94,10 @@ public class MainActivity extends Activity {
             public void run() {
                 SmsCollector smsCollector = new SmsCollector();
                 smsCollector.collect();
-                List<String[]> results = smsCollector.getResult();
+                List<SmsData> results = smsCollector.getResult();
+                CollectorToDb.writeSms(db, results);
                 if (results != null) {
-                    for (String[] item : results) {
-                        Log.i(TAG, "address: " + item[0] + " type: " + item[1] + " date: " + item[2] + " person: " + item[3]);
-                    }
+                    Log.i(TAG, results.toString());
                 }
             }
         });
@@ -106,6 +109,7 @@ public class MainActivity extends Activity {
                 final SensorsCollector sensorsCollector = new SensorsCollector(typeSensors, maxTimes);
                 sensorsCollector.collect();
                 Map<Integer, ArrayList<SensorData>> results = sensorsCollector.getResult();
+                CollectorToDb.writeSensors(db, results);
                 if (results != null) {
                     for (Map.Entry<Integer, ArrayList<SensorData>> entry : results.entrySet()) {
                         int typeSensor = entry.getKey();
@@ -122,8 +126,9 @@ public class MainActivity extends Activity {
             public void run() {
                 ScreenCollector screenCollector = new ScreenCollector();
                 screenCollector.collect();
-                boolean result = screenCollector.getResult();
-                Log.i(TAG, "is screen on: " + result);
+                ScreenData result = screenCollector.getResult();
+                CollectorToDb.writeScreen(db, result);
+                Log.i(TAG, result.toString());
             }
         });
         Thread foregroundAppCollectorThread = new Thread(new Runnable() {
@@ -131,8 +136,9 @@ public class MainActivity extends Activity {
             public void run() {
                 ForegroundAppCollector foregroundAppCollector = new ForegroundAppCollector();
                 foregroundAppCollector.collect();
-                String result = foregroundAppCollector.getResult();
-                Log.i(TAG, "foreground app: " + result);
+                ForegroundAppData result = foregroundAppCollector.getResult();
+                CollectorToDb.writeForegroundApp(db, result);
+                Log.i(TAG, "foreground app: " + result.toString());
             }
         });
         Thread runningAppCollectorThread = new Thread(new Runnable() {
@@ -140,13 +146,13 @@ public class MainActivity extends Activity {
             public void run() {
                 RunningAppCollector runningAppCollector = new RunningAppCollector();
                 runningAppCollector.collect();
-                List<String> results = runningAppCollector.getResult();
+                List<RunningAppData> results = runningAppCollector.getResult();
+                CollectorToDb.writeRunningApp(db, results);
                 if (results != null) {
-                    Log.i(TAG, "running apps: " + results.toString());
+                    Log.i(TAG, results.toString());
                 }
             }
         });
-
         Thread[] threads = new Thread[]{wifiCollectorThread, contactCollectorThread, callLogCollectorThread,
                 audioCollectorThread, locationCollectorThread, smsCollectorThread, sensorCollectorThread,
                 screenCollectorThread, foregroundAppCollectorThread, runningAppCollectorThread};

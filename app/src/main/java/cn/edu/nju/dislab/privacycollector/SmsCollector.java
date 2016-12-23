@@ -19,7 +19,7 @@ public class SmsCollector {
     private static final String[] PERMISSIONS = {Manifest.permission.READ_SMS};
     private Context mContext;
     private ContentResolver mContentResolver;
-    private List<String[]> results;
+    private List<SmsData> results;
 
     public SmsCollector() {
         this(MainApplication.getContext());
@@ -52,7 +52,7 @@ public class SmsCollector {
                 String type = cursor.getString(cursor.getColumnIndex(Telephony.Sms.TYPE));
                 String date = cursor.getString(cursor.getColumnIndex(Telephony.Sms.DATE));
                 String person = cursor.getString(cursor.getColumnIndex(Telephony.Sms.PERSON));
-                results.add(new String[]{address, type, date, person});
+                results.add(new SmsData(address, type, date, person));
             }
         } else {
             Log.i(TAG, "empty cursor");
@@ -62,7 +62,7 @@ public class SmsCollector {
         return Collector.COLLECT_SUCCESS;
     }
 
-    public List<String[]> getResult() {
+    public List<SmsData> getResult() {
         return results;
     }
 

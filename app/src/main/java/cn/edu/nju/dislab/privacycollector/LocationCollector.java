@@ -67,6 +67,9 @@ public class LocationCollector {
         mLocationClient.unRegisterLocationListener(mLocationListener);
         mLocationClient.stopLocation();
         mLocationClient.onDestroy();
+        if (result == null || result.getErrorCode() != 0) {
+            return Collector.COLLECT_FAILED;
+        }
         return Collector.COLLECT_SUCCESS;
     }
 

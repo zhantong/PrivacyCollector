@@ -21,13 +21,13 @@ public class AudioCollector {
     private Handler mHandler;
     private MediaRecorder mRecorder;
     private int mTickCount;
-    private List<Double> results;
+    private List<AudioData> results;
     private final Object LOCK = new Object();
     private Runnable mPollTask = new Runnable() {
         @Override
         public void run() {
             double amp = getAmplitude();
-            results.add(amp);
+            results.add(new AudioData(System.currentTimeMillis(), amp));
             mTickCount++;
             if (mTickCount > MAX_TICKS) {
                 stop();
@@ -90,7 +90,7 @@ public class AudioCollector {
             return 0;
     }
 
-    public List<Double> getResult() {
+    public List<AudioData> getResult() {
         return results;
     }
 

@@ -7,12 +7,20 @@ import java.util.Arrays;
  */
 
 public class SensorData {
-    public long timestamp;
-    public float[] values;
+    private long timestamp;
+    private float[] values;
 
     public SensorData(long timestamp, float[] values) {
         this.timestamp = timestamp;
         this.values = values;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public float[] getValues() {
+        return values;
     }
 
     @Override

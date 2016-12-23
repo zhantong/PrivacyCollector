@@ -19,7 +19,7 @@ public class ScreenCollector {
     private Context mContext;
     private DisplayManager mDisplayManager;
     private PowerManager mPowerManager;
-    private boolean result;
+    private ScreenData result;
 
     public ScreenCollector() {
         this(MainApplication.getContext());
@@ -36,20 +36,21 @@ public class ScreenCollector {
     }
 
     public int collect() {
-        result = false;
+        boolean isScreenOn = false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             for (Display display : mDisplayManager.getDisplays()) {
                 if (display.getState() != Display.STATE_OFF) {
-                    result = true;
+                    isScreenOn = true;
                 }
             }
         } else {
-            result = mPowerManager.isScreenOn();
+            isScreenOn = mPowerManager.isScreenOn();
         }
+        result = new ScreenData(isScreenOn, System.currentTimeMillis());
         return Collector.COLLECT_SUCCESS;
     }
 
-    public boolean getResult() {
+    public ScreenData getResult() {
         return result;
     }
 

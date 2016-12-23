@@ -19,7 +19,7 @@ public class CallLogCollector {
     private static final String[] PERMISSIONS = {Manifest.permission.READ_CALL_LOG};
     private Context mContext;
     private ContentResolver mContentResolver;
-    private List<String[]> results;
+    private List<CallLogData> results;
 
     public CallLogCollector() {
         this(MainApplication.getContext());
@@ -52,7 +52,7 @@ public class CallLogCollector {
                 String type = cursor.getString(cursor.getColumnIndex(CallLog.Calls.TYPE));
                 String date = cursor.getString(cursor.getColumnIndex(CallLog.Calls.DATE));
                 String duration = cursor.getString(cursor.getColumnIndex(CallLog.Calls.DURATION));
-                results.add(new String[]{number, type, date, duration});
+                results.add(new CallLogData(number, type, date, duration));
             }
         } else {
             Log.i(TAG, "empty cursor");
@@ -62,7 +62,7 @@ public class CallLogCollector {
         return Collector.COLLECT_SUCCESS;
     }
 
-    public List<String[]> getResult() {
+    public List<CallLogData> getResult() {
         return results;
     }
 

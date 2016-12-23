@@ -21,7 +21,7 @@ public class RunningAppCollector {
     private Context mContext;
     private ActivityManager mActivityManager;
     private UsageStatsManager mUsageStatsManager;
-    private List<String> results;
+    private List<RunningAppData> results;
 
     public RunningAppCollector() {
         this(MainApplication.getContext());
@@ -51,7 +51,7 @@ public class RunningAppCollector {
                 return Collector.COLLECT_FAILED;
             }
             for (UsageStats usageStats : usageStatses) {
-                results.add(usageStats.getPackageName());
+                results.add(new RunningAppData(usageStats.getPackageName(), System.currentTimeMillis()));
             }
         } else {
             List<ActivityManager.RunningTaskInfo> runningTaskInfos;
@@ -70,13 +70,13 @@ public class RunningAppCollector {
                 return Collector.COLLECT_FAILED;
             }
             for (ActivityManager.RunningTaskInfo runningTaskInfo : runningTaskInfos) {
-                results.add(runningTaskInfo.baseActivity.getPackageName());
+                results.add(new RunningAppData(runningTaskInfo.baseActivity.getPackageName(), System.currentTimeMillis()));
             }
         }
         return Collector.COLLECT_SUCCESS;
     }
 
-    public List<String> getResult() {
+    public List<RunningAppData> getResult() {
         return results;
     }
 
