@@ -6,9 +6,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by zhantong on 2016/12/21.
  */
@@ -21,13 +18,13 @@ public class AudioCollector {
     private Handler mHandler;
     private MediaRecorder mRecorder;
     private int mTickCount;
-    private List<AudioData> results;
+    private AudioData result;
     private final Object LOCK = new Object();
     private Runnable mPollTask = new Runnable() {
         @Override
         public void run() {
             double amp = getAmplitude();
-            results.add(new AudioData(System.currentTimeMillis(), amp));
+            result.put(System.currentTimeMillis(), amp);
             mTickCount++;
             if (mTickCount > MAX_TICKS) {
                 stop();
@@ -70,7 +67,7 @@ public class AudioCollector {
             return Collector.NO_PERMISSION;
         }
         mTickCount = 0;
-        results = new ArrayList<>();
+        result = new AudioData();
         mHandler.postDelayed(mPollTask, POLL_INTERVAL);
         synchronized (LOCK) {
             try {
@@ -90,8 +87,8 @@ public class AudioCollector {
             return 0;
     }
 
-    public List<AudioData> getResult() {
-        return results;
+    public AudioData getResult() {
+        return result;
     }
 
     public static String[] getPermissions() {

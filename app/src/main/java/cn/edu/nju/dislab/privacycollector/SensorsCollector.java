@@ -21,7 +21,7 @@ import static android.content.Context.SENSOR_SERVICE;
 public class SensorsCollector {
     private static final String TAG = "SensorCollector";
     private static final String[] PERMISSIONS = {};
-    private Map<Integer, ArrayList<SensorData>> results;
+    private SensorsData result;
     private Context mContext;
     private int[] mTypeSensors;
     private SensorManager mSensorManager;
@@ -41,7 +41,7 @@ public class SensorsCollector {
                 if (timestamp - mStartTimes.get(type) > mMaxTimes.get(type)) {
                     mIsDone.put(type, true);
                 } else {
-                    results.get(type).add(new SensorData(event.timestamp, event.values.clone()));
+                    result.put(type, event.timestamp, event.values.clone());
                 }
             } else {
                 if (!mIsDone.containsValue(false)) {
@@ -68,15 +68,14 @@ public class SensorsCollector {
         mSensorManager = (SensorManager) mContext.getSystemService(SENSOR_SERVICE);
         mStartTimes = new HashMap<>();
         mMaxTimes = new HashMap<>();
-        results = new HashMap<>();
         for (int i = 0; i < typeSensors.length; i++) {
             int typeSensor = mTypeSensors[i];
             mMaxTimes.put(typeSensor, maxTimes[i]);
-            results.put(typeSensor, new ArrayList<SensorData>());
         }
     }
 
     public int collect() {
+        result = new SensorsData();
         List<Sensor> sensors = new ArrayList<>();
         mIsDone = new HashMap<>();
         for (int typeSensor : mTypeSensors) {
@@ -101,8 +100,8 @@ public class SensorsCollector {
         return Collector.COLLECT_SUCCESS;
     }
 
-    public Map<Integer, ArrayList<SensorData>> getResult() {
-        return results;
+    public SensorsData getResult() {
+        return result;
     }
 
     public static String[] getPermissions() {

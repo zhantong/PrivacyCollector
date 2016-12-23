@@ -1,40 +1,75 @@
 package cn.edu.nju.dislab.privacycollector;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
+import android.provider.BaseColumns;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by zhantong on 2016/12/22.
  */
 
 public class SmsData {
-    private String address;
-    private String type;
-    private String date;
-    private String person;
+    private List<Sms> smses;
 
-    public SmsData(String address, String type, String date, String person) {
-        this.address = address;
-        this.type = type;
-        this.date = date;
-        this.person = person;
+    private class Sms {
+        public String address;
+        public String type;
+        public String date;
+        public String person;
+
+        public Sms(String address, String type, String date, String person) {
+            this.address = address;
+            this.type = type;
+            this.date = date;
+            this.person = person;
+        }
+
+        @Override
+        public String toString() {
+            return address + " " + type + " " + date + " " + person;
+        }
     }
 
-    public String getAddress() {
-        return address;
+
+    public SmsData() {
+        smses = new ArrayList<>();
     }
 
-    public String getType() {
-        return type;
+    public void put(String address, String type, String date, String person) {
+        smses.add(new Sms(address, type, date, person));
     }
 
-    public String getDate() {
-        return date;
-    }
-
-    public String getPerson() {
-        return person;
+    public void toDb(SQLiteDatabase db) {
+        class Table implements BaseColumns {
+            static final String TABLE_NAME = "sms";
+            static final String COLUMN_NAME_ADDRESS = "address";
+            static final String COLUMN_NAME_TYPE = "type";
+            static final String COLUMN_NAME_DATE = "date";
+            static final String COLUMN_NAME_PERSON = "person";
+        }
+        String SQL_CREATE_TABLE =
+                "CREATE TABLE IF NOT EXISTS " + Table.TABLE_NAME + " (" +
+                        Table._ID + " INTEGER PRIMARY KEY," +
+                        Table.COLUMN_NAME_ADDRESS + " TEXT," +
+                        Table.COLUMN_NAME_TYPE + " TEXT," +
+                        Table.COLUMN_NAME_DATE + " TEXT," +
+                        Table.COLUMN_NAME_PERSON + " TEXT)";
+        db.execSQL(SQL_CREATE_TABLE);
+        for (Sms sms : smses) {
+            ContentValues values = new ContentValues();
+            values.put(Table.COLUMN_NAME_ADDRESS, sms.address);
+            values.put(Table.COLUMN_NAME_TYPE, sms.type);
+            values.put(Table.COLUMN_NAME_DATE, sms.date);
+            values.put(Table.COLUMN_NAME_PERSON, sms.person);
+            db.insert(Table.TABLE_NAME, null, values);
+        }
     }
 
     @Override
     public String toString() {
-        return address + " " + type + " " + date + " " + person;
+        return smses.toString();
     }
 }

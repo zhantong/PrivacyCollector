@@ -3,7 +3,6 @@ package cn.edu.nju.dislab.privacycollector;
 
 import android.Manifest;
 import android.content.Context;
-import android.util.Log;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
@@ -20,11 +19,11 @@ public class LocationCollector {
     private AMapLocationClient mLocationClient = null;
     private Context mContext;
     private final Object LOCK = new Object();
-    private AMapLocation result;
+    private LocationData result;
     private AMapLocationListener mLocationListener = new AMapLocationListener() {
         @Override
         public void onLocationChanged(AMapLocation aMapLocation) {
-            result = aMapLocation;
+            result = new LocationData(aMapLocation);
             synchronized (LOCK) {
                 LOCK.notify();
             }
@@ -67,13 +66,13 @@ public class LocationCollector {
         mLocationClient.unRegisterLocationListener(mLocationListener);
         mLocationClient.stopLocation();
         mLocationClient.onDestroy();
-        if (result == null || result.getErrorCode() != 0) {
+        if (result == null || result.getLocation().getErrorCode() != 0) {
             return Collector.COLLECT_FAILED;
         }
         return Collector.COLLECT_SUCCESS;
     }
 
-    public AMapLocation getResult() {
+    public LocationData getResult() {
         return result;
     }
 

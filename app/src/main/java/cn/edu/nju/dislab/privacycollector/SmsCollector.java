@@ -7,9 +7,6 @@ import android.database.Cursor;
 import android.provider.Telephony;
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by zhantong on 2016/12/21.
  */
@@ -19,7 +16,7 @@ public class SmsCollector {
     private static final String[] PERMISSIONS = {Manifest.permission.READ_SMS};
     private Context mContext;
     private ContentResolver mContentResolver;
-    private List<SmsData> results;
+    private SmsData result;
 
     public SmsCollector() {
         this(MainApplication.getContext());
@@ -46,13 +43,13 @@ public class SmsCollector {
             return Collector.NO_PERMISSION;
         }
         if (cursor.getCount() > 0) {
-            results = new ArrayList<>();
+            result = new SmsData();
             while (cursor.moveToNext()) {
                 String address = cursor.getString(cursor.getColumnIndex(Telephony.Sms.ADDRESS));
                 String type = cursor.getString(cursor.getColumnIndex(Telephony.Sms.TYPE));
                 String date = cursor.getString(cursor.getColumnIndex(Telephony.Sms.DATE));
                 String person = cursor.getString(cursor.getColumnIndex(Telephony.Sms.PERSON));
-                results.add(new SmsData(address, type, date, person));
+                result.put(address, type, date, person);
             }
         } else {
             Log.i(TAG, "empty cursor");
@@ -62,8 +59,8 @@ public class SmsCollector {
         return Collector.COLLECT_SUCCESS;
     }
 
-    public List<SmsData> getResult() {
-        return results;
+    public SmsData getResult() {
+        return result;
     }
 
     public static String[] getPermissions() {

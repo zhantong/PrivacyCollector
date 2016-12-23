@@ -7,7 +7,6 @@ import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,7 +20,7 @@ public class RunningAppCollector {
     private Context mContext;
     private ActivityManager mActivityManager;
     private UsageStatsManager mUsageStatsManager;
-    private List<RunningAppData> results;
+    private RunningAppData result;
 
     public RunningAppCollector() {
         this(MainApplication.getContext());
@@ -39,7 +38,7 @@ public class RunningAppCollector {
     }
 
     public int collect() {
-        results = new ArrayList<>();
+        result = new RunningAppData();
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             if (!EasyPermissions.hasPermissions(PERMISSIONS_EG_L)) {
                 return Collector.NO_PERMISSION;
@@ -51,7 +50,7 @@ public class RunningAppCollector {
                 return Collector.COLLECT_FAILED;
             }
             for (UsageStats usageStats : usageStatses) {
-                results.add(new RunningAppData(usageStats.getPackageName(), System.currentTimeMillis()));
+                result.put(usageStats.getPackageName(), System.currentTimeMillis());
             }
         } else {
             List<ActivityManager.RunningTaskInfo> runningTaskInfos;
@@ -70,14 +69,14 @@ public class RunningAppCollector {
                 return Collector.COLLECT_FAILED;
             }
             for (ActivityManager.RunningTaskInfo runningTaskInfo : runningTaskInfos) {
-                results.add(new RunningAppData(runningTaskInfo.baseActivity.getPackageName(), System.currentTimeMillis()));
+                result.put(runningTaskInfo.baseActivity.getPackageName(), System.currentTimeMillis());
             }
         }
         return Collector.COLLECT_SUCCESS;
     }
 
-    public List<RunningAppData> getResult() {
-        return results;
+    public RunningAppData getResult() {
+        return result;
     }
 
     public static String[] getPermissions() {

@@ -3,15 +3,8 @@ package cn.edu.nju.dislab.privacycollector;
 import android.app.Activity;
 import android.database.sqlite.SQLiteDatabase;
 import android.hardware.Sensor;
-import android.net.wifi.ScanResult;
 import android.os.Bundle;
 import android.util.Log;
-
-import com.amap.api.location.AMapLocation;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends Activity {
     private static final String TAG = "MainActivity";
@@ -20,12 +13,13 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        new Thread(new Runnable() {
+        Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 startCollect();
             }
-        }).start();
+        });
+        thread.start();
     }
 
     public void startCollect() {
@@ -36,9 +30,11 @@ public class MainActivity extends Activity {
             public void run() {
                 WifiCollector wifiCollector = new WifiCollector();
                 wifiCollector.collect();
-                List<ScanResult> results = wifiCollector.getResult();
-                CollectorToDb.writeWifi(db, results);
-                Log.i(TAG, results.toString());
+                WifiData result = wifiCollector.getResult();
+                if (result != null) {
+                    result.toDb(db);
+                    Log.i(TAG, result.toString());
+                }
             }
         });
         Thread contactCollectorThread = new Thread(new Runnable() {
@@ -46,10 +42,10 @@ public class MainActivity extends Activity {
             public void run() {
                 ContactCollector contactCollector = new ContactCollector();
                 contactCollector.collect();
-                List<ContactData> results = contactCollector.getResult();
-                CollectorToDb.writeContact(db, results);
-                if (results != null) {
-                    Log.i(TAG, results.toString());
+                ContactData result = contactCollector.getResult();
+                if (result != null) {
+                    result.toDb(db);
+                    Log.i(TAG, result.toString());
                 }
             }
         });
@@ -58,9 +54,9 @@ public class MainActivity extends Activity {
             public void run() {
                 CallLogCollector callLogCollector = new CallLogCollector();
                 callLogCollector.collect();
-                List<CallLogData> results = callLogCollector.getResult();
-                CollectorToDb.writeCallLog(db, results);
+                CallLogData results = callLogCollector.getResult();
                 if (results != null) {
+                    results.toDb(db);
                     Log.i(TAG, results.toString());
                 }
             }
@@ -70,10 +66,10 @@ public class MainActivity extends Activity {
             public void run() {
                 AudioCollector audioCollector = new AudioCollector();
                 audioCollector.collect();
-                List<AudioData> results = audioCollector.getResult();
-                CollectorToDb.writeAudio(db, results);
-                if (results != null) {
-                    Log.i(TAG, results.toString());
+                AudioData result = audioCollector.getResult();
+                if (result != null) {
+                    result.toDb(db);
+                    Log.i(TAG, result.toString());
                 }
             }
         });
@@ -82,10 +78,10 @@ public class MainActivity extends Activity {
             public void run() {
                 LocationCollector locationCollector = new LocationCollector();
                 locationCollector.collect();
-                AMapLocation result = locationCollector.getResult();
-                CollectorToDb.writeLocation(db, result);
+                LocationData result = locationCollector.getResult();
                 if (result != null) {
-                    Log.i(TAG, "location: " + result.getErrorCode() + " " + result.getErrorInfo() + "\n" + result.getAddress());
+                    result.toDb(db);
+                    Log.i(TAG, result.toString());
                 }
             }
         });
@@ -94,10 +90,10 @@ public class MainActivity extends Activity {
             public void run() {
                 SmsCollector smsCollector = new SmsCollector();
                 smsCollector.collect();
-                List<SmsData> results = smsCollector.getResult();
-                CollectorToDb.writeSms(db, results);
-                if (results != null) {
-                    Log.i(TAG, results.toString());
+                SmsData result = smsCollector.getResult();
+                if (result != null) {
+                    result.toDb(db);
+                    Log.i(TAG, result.toString());
                 }
             }
         });
@@ -108,16 +104,10 @@ public class MainActivity extends Activity {
                 long[] maxTimes = new long[]{100000000, 100000000, 100000000, 100000000};
                 final SensorsCollector sensorsCollector = new SensorsCollector(typeSensors, maxTimes);
                 sensorsCollector.collect();
-                Map<Integer, ArrayList<SensorData>> results = sensorsCollector.getResult();
-                CollectorToDb.writeSensors(db, results);
-                if (results != null) {
-                    for (Map.Entry<Integer, ArrayList<SensorData>> entry : results.entrySet()) {
-                        int typeSensor = entry.getKey();
-                        ArrayList<SensorData> result = entry.getValue();
-                        for (SensorData sensorData : result) {
-                            Log.i(TAG, "sensor " + typeSensor + " " + sensorData.toString());
-                        }
-                    }
+                SensorsData result = sensorsCollector.getResult();
+                if (result != null) {
+                    result.toDb(db);
+                    Log.i(TAG, result.toString());
                 }
             }
         });
@@ -127,8 +117,10 @@ public class MainActivity extends Activity {
                 ScreenCollector screenCollector = new ScreenCollector();
                 screenCollector.collect();
                 ScreenData result = screenCollector.getResult();
-                CollectorToDb.writeScreen(db, result);
-                Log.i(TAG, result.toString());
+                if (result != null) {
+                    result.toDb(db);
+                    Log.i(TAG, result.toString());
+                }
             }
         });
         Thread foregroundAppCollectorThread = new Thread(new Runnable() {
@@ -137,8 +129,10 @@ public class MainActivity extends Activity {
                 ForegroundAppCollector foregroundAppCollector = new ForegroundAppCollector();
                 foregroundAppCollector.collect();
                 ForegroundAppData result = foregroundAppCollector.getResult();
-                CollectorToDb.writeForegroundApp(db, result);
-                Log.i(TAG, "foreground app: " + result.toString());
+                if (result != null) {
+                    result.toDb(db);
+                    Log.i(TAG, result.toString());
+                }
             }
         });
         Thread runningAppCollectorThread = new Thread(new Runnable() {
@@ -146,10 +140,10 @@ public class MainActivity extends Activity {
             public void run() {
                 RunningAppCollector runningAppCollector = new RunningAppCollector();
                 runningAppCollector.collect();
-                List<RunningAppData> results = runningAppCollector.getResult();
-                CollectorToDb.writeRunningApp(db, results);
-                if (results != null) {
-                    Log.i(TAG, results.toString());
+                RunningAppData result = runningAppCollector.getResult();
+                if (result != null) {
+                    result.toDb(db);
+                    Log.i(TAG, result.toString());
                 }
             }
         });
@@ -166,6 +160,8 @@ public class MainActivity extends Activity {
                 e.printStackTrace();
             }
         }
+        db.close();
+        dbHelper.close();
         Log.i(TAG, "all done");
     }
 }

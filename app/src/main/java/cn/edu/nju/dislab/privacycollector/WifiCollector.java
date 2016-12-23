@@ -5,11 +5,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.util.Log;
-
-import java.util.List;
 
 /**
  * Created by zhantong on 2016/12/21.
@@ -20,7 +17,7 @@ public class WifiCollector {
     private static final String[] PERMISSIONS = {Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.CHANGE_WIFI_STATE};
     private WifiManager mWifiManager;
     private Context mContext;
-    private List<ScanResult> scanResults;
+    private WifiData result;
 
     public WifiCollector() {
         this(MainApplication.getContext());
@@ -73,13 +70,14 @@ public class WifiCollector {
                 e.printStackTrace();
                 return Collector.COLLECT_FAILED;
             }
-            scanResults = mWifiManager.getScanResults();
+            result = new WifiData();
+            result.put(mWifiManager.getScanResults());
         }
         return Collector.COLLECT_SUCCESS;
     }
 
-    public List<ScanResult> getResult() {
-        return scanResults;
+    public WifiData getResult() {
+        return result;
     }
 
     public static String[] getPermissions() {

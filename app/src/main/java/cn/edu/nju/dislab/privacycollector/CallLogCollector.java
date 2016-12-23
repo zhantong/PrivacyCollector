@@ -7,9 +7,6 @@ import android.database.Cursor;
 import android.provider.CallLog;
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by zhantong on 2016/12/21.
  */
@@ -19,7 +16,7 @@ public class CallLogCollector {
     private static final String[] PERMISSIONS = {Manifest.permission.READ_CALL_LOG};
     private Context mContext;
     private ContentResolver mContentResolver;
-    private List<CallLogData> results;
+    private CallLogData result;
 
     public CallLogCollector() {
         this(MainApplication.getContext());
@@ -46,13 +43,13 @@ public class CallLogCollector {
             return Collector.NO_PERMISSION;
         }
         if (cursor.getCount() > 0) {
-            results = new ArrayList<>();
+            result = new CallLogData();
             while (cursor.moveToNext()) {
                 String number = cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER));
                 String type = cursor.getString(cursor.getColumnIndex(CallLog.Calls.TYPE));
                 String date = cursor.getString(cursor.getColumnIndex(CallLog.Calls.DATE));
                 String duration = cursor.getString(cursor.getColumnIndex(CallLog.Calls.DURATION));
-                results.add(new CallLogData(number, type, date, duration));
+                result.put(number, type, date, duration);
             }
         } else {
             Log.i(TAG, "empty cursor");
@@ -62,8 +59,8 @@ public class CallLogCollector {
         return Collector.COLLECT_SUCCESS;
     }
 
-    public List<CallLogData> getResult() {
-        return results;
+    public CallLogData getResult() {
+        return result;
     }
 
     public static String[] getPermissions() {

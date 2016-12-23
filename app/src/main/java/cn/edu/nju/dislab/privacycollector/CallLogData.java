@@ -1,40 +1,75 @@
 package cn.edu.nju.dislab.privacycollector;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
+import android.provider.BaseColumns;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by zhantong on 2016/12/22.
  */
 
 public class CallLogData {
-    private String number;
-    private String type;
-    private String date;
-    private String duration;
+    private List<CallLog> callLogs;
 
-    public CallLogData(String number, String type, String date, String duration) {
-        this.number = number;
-        this.type = type;
-        this.date = date;
-        this.duration = duration;
+    private class CallLog {
+        public String number;
+        public String type;
+        public String date;
+        public String duration;
+
+        public CallLog(String number, String type, String date, String duration) {
+            this.number = number;
+            this.type = type;
+            this.date = date;
+            this.duration = duration;
+        }
+
+        @Override
+        public String toString() {
+            return date + " " + number + " " + type + " " + duration;
+        }
     }
 
-    public String getNumber() {
-        return number;
+
+    public CallLogData() {
+        callLogs = new ArrayList<>();
     }
 
-    public String getType() {
-        return type;
+    public void put(String number, String type, String date, String duration) {
+        callLogs.add(new CallLog(number, type, date, duration));
     }
 
-    public String getDate() {
-        return date;
-    }
-
-    public String getDuration() {
-        return duration;
+    public void toDb(SQLiteDatabase db) {
+        class Table implements BaseColumns {
+            static final String TABLE_NAME = "call_log";
+            static final String COLUMN_NAME_NUMBER = "number";
+            static final String COLUMN_NAME_TYPE = "type";
+            static final String COLUMN_NAME_DATE = "date";
+            static final String COLUMN_NAME_DURATION = "duration";
+        }
+        String SQL_CREATE_TABLE =
+                "CREATE TABLE IF NOT EXISTS " + Table.TABLE_NAME + " (" +
+                        Table._ID + " INTEGER PRIMARY KEY," +
+                        Table.COLUMN_NAME_NUMBER + " TEXT," +
+                        Table.COLUMN_NAME_TYPE + " TEXT," +
+                        Table.COLUMN_NAME_DATE + " TEXT," +
+                        Table.COLUMN_NAME_DURATION + " TEXT)";
+        db.execSQL(SQL_CREATE_TABLE);
+        for (CallLog callLog : callLogs) {
+            ContentValues values = new ContentValues();
+            values.put(Table.COLUMN_NAME_NUMBER, callLog.number);
+            values.put(Table.COLUMN_NAME_TYPE, callLog.type);
+            values.put(Table.COLUMN_NAME_DATE, callLog.date);
+            values.put(Table.COLUMN_NAME_DURATION, callLog.duration);
+            db.insert(Table.TABLE_NAME, null, values);
+        }
     }
 
     @Override
     public String toString() {
-        return date + " " + number + " " + type + " " + duration;
+        return callLogs.toString();
     }
 }
