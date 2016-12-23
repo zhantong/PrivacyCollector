@@ -25,6 +25,18 @@ public class MainActivity extends Activity {
     public void startCollect() {
         DbHelper dbHelper = new DbHelper();
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
+        Thread phoneCollectorThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                PhoneCollector phoneCollector = new PhoneCollector();
+                phoneCollector.collect();
+                PhoneData result = phoneCollector.getResult();
+                if (result != null) {
+                    result.toDb(db);
+                    Log.i(TAG, result.toString());
+                }
+            }
+        });
         Thread wifiCollectorThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -147,9 +159,10 @@ public class MainActivity extends Activity {
                 }
             }
         });
+
         Thread[] threads = new Thread[]{wifiCollectorThread, contactCollectorThread, callLogCollectorThread,
                 audioCollectorThread, locationCollectorThread, smsCollectorThread, sensorCollectorThread,
-                screenCollectorThread, foregroundAppCollectorThread, runningAppCollectorThread};
+                screenCollectorThread, foregroundAppCollectorThread, runningAppCollectorThread, phoneCollectorThread};
         for (Thread thread : threads) {
             thread.start();
         }
